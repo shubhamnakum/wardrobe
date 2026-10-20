@@ -72,3 +72,17 @@ Follow this workflow for every task:
 - Treat updating these two documents as part of the definition of done for every code-changing task.
 
 **Definition of Done:** A code-changing task is not complete until the implementation, relevant verification, `docs/CHANGE_LOG.md`, and `docs/TECHNICAL_DECISIONS.md` have all been addressed. If any part cannot be completed, explicitly report the outstanding item and why.
+
+## Zero-Cost Constraint (Mandatory)
+
+Nothing built in this project may incur charges. The app is local and self-hosted; it is never deployed to AWS or any paid cloud.
+
+- Use only free, open-source, locally running software and models. No paid APIs, no API keys that bill, no cloud services, no managed databases, no hosted GPUs.
+- Before adding any dependency, service, model or tool, confirm it is free for this use (check the licence/pricing). If unsure, ask first.
+- External providers (hosted LLM/vision/weather APIs) are not to be implemented or enabled. Keep only the provider interfaces; adapters stay local.
+- Optional features that need the internet (for example weather) must use a free, keyless source or stay out of scope.
+- Record the cost check in `root_docs/TECHNICAL_DECISIONS.md` whenever a dependency or model is added.
+
+## Task Tracker (Mandatory)
+
+`root_docs/TRACKER.md` is the status record for all backend and frontend sub-tasks. When a sub-task is completed (or started), update its checkbox there in the same task: `[ ]` todo, `[~]` in progress, `[x]` done. Refresh the progress counts in the headings.
