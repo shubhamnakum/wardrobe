@@ -86,3 +86,31 @@ Nothing built in this project may incur charges. The app is local and self-hoste
 ## Task Tracker (Mandatory)
 
 `root_docs/TRACKER.md` is the status record for all backend and frontend sub-tasks. When a sub-task is completed (or started), update its checkbox there in the same task: `[ ]` todo, `[~]` in progress, `[x]` done. Refresh the progress counts in the headings.
+
+## Junior-Developer Explanation (Mandatory)
+
+After every code-changing task, write `root_docs/LATEST_CHANGE_EXPLAINED.md` explaining the change as if to a junior developer. **Overwrite the file every time. Do not append and do not keep history** (history lives in `CHANGE_LOG.md`).
+
+Write it in plain, friendly English (not caveman style), covering:
+
+- **What changed, in one paragraph:** the goal in simple words.
+- **Why we needed it:** the problem it solves, before explaining the solution.
+- **How it works:** walk through the flow step by step, following one real example from start to finish.
+- **Files touched:** each file with one line on what it is for and how the files connect.
+- **Key concepts:** short explanations of any technique, library or pattern a junior may not know (for example transactions, ORM, migrations), with a tiny code snippet where it helps.
+- **How to run and check it:** the exact commands, and what output means success.
+- **Gotchas and things to watch out for:** mistakes a newcomer could make with this code.
+- **What comes next:** the next task or story this change enables.
+
+Avoid unexplained jargon. Define a term the first time it appears.
+
+## Docstrings (Mandatory)
+
+All code written or changed from now on must carry docstrings so that it is easy to understand:
+
+- Every module gets a short docstring saying what it is for.
+- Every class and every function or method gets a docstring: what it does and why it exists. Add arguments, return value and raised errors when they are not obvious from the signature.
+- Describe intent and behaviour, not a line-by-line paraphrase of the code. Mention important rules, such as "never commits" or "returns None when the garment is deleted".
+- Applies to test functions too (one line saying what behaviour is checked), and to the frontend (JSDoc/TSDoc comments on components, hooks and functions).
+- Generated files (for example Alembic revision files) are exempt.
+- Do not rewrite older code just to add docstrings unless asked; add them when touching that code.
