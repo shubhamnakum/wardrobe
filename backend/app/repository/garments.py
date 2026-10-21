@@ -5,7 +5,7 @@ from typing import Any
 from sqlalchemy import ColumnElement, Select, exists, func, literal, or_, select
 from sqlalchemy.orm import Session
 
-from app.repository.models import Garment, Processing
+from app.repository.models import Garment, GarmentImage, Processing
 from app.repository.util import utcnow_iso
 
 EDITABLE_FIELDS = frozenset(
@@ -126,3 +126,37 @@ class GarmentRepository:
         garment.deleted_at = utcnow_iso()
         self._s.flush()
         return True
+
+    def add_image(
+        self,
+        garment_id: str,
+        original_path: str,
+        content_type: str,
+        file_size: int,
+        thumbnail_path: str | None = None,
+    ) -> GarmentImage:
+        """Record a stored photo for a garment.
+
+        Paths are *relative* storage paths as returned by ``StorageService.save``.
+        """
+        image = GarmentImage(
+            id=str(uuid.uuid4()),
+            garment_id=garment_id,
+            original_path=original_path,
+            thumbnail_path=thumbnail_path,
+            content_type=content_type,
+            file_size=file_size,
+        )
+        self._s.add(image)
+        self._s.flush()
+        return image
+
+    def get_image(self, garment_id: str) -> GarmentImage | None:
+        """Return the newest image record of a garment, or ``None`` if it has none."""
+        stmt = (
+            select(GarmentImage)
+            .where(GarmentImage.garment_id == garment_id)
+            .order_by(GarmentImage.created_at.desc(), GarmentImage.id)
+            .limit(1)
+        )
+        return self._s.scalars(stmt).first()
