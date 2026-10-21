@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api import garments, health
+from app.api import garments, health, taxonomy
 from app.api.errors import register_error_handlers
 from app.config import get_settings
 from app.config.logging import setup_logging
@@ -35,6 +35,7 @@ def create_app() -> FastAPI:
     register_error_handlers(app)
     app.include_router(health.router)
     app.include_router(garments.router)
+    app.include_router(taxonomy.router)
     return app
 
 

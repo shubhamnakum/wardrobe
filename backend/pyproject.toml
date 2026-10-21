@@ -25,7 +25,11 @@ dev = [
 include = ["app*"]
 
 [tool.setuptools.package-data]
-app = ["repository/migrations/script.py.mako", "repository/migrations/versions/*.py"]
+app = [
+    "config/taxonomy.json",
+    "repository/migrations/script.py.mako",
+    "repository/migrations/versions/*.py",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -37,6 +41,9 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/repository/seed.py" = ["E501"]  # compact sample-data table
 
 [tool.mypy]
 strict = true

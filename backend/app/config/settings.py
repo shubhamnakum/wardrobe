@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     storage_root: Path | None = None
     log_dir: Path | None = None
     model_dir: Path | None = None  # weights live outside the repo
+    taxonomy_path: Path | None = None  # override the packaged taxonomy.json
 
     log_level: str = "INFO"
     device: Literal["auto", "cuda", "cpu"] = "auto"

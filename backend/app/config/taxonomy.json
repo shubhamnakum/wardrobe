@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "formality": {
+    "min": 1,
+    "max": 5,
+    "labels": {
+      "1": "Very casual",
+      "2": "Casual",
+      "3": "Smart casual",
+      "4": "Business / semi-formal",
+      "5": "Formal"
+    }
+  },
+  "layering_roles": ["base", "mid", "outer"],
+  "seasons": ["spring", "summer", "monsoon", "autumn", "winter", "all_season"],
+  "style_tags": [
+    "casual", "smart_casual", "formal", "business", "classic", "minimal", "understated",
+    "elegant", "bold", "trendy", "sporty", "streetwear", "bohemian", "vintage", "relaxed",
+    "party", "festive", "traditional"
+  ],
+  "patterns": [
+    "solid", "striped", "checked", "plaid", "houndstooth", "polka_dot", "floral", "printed",
+    "paisley", "geometric", "abstract", "animal_print", "camouflage", "tie_dye", "colour_block",
+    "embroidered", "textured", "graphic"
+  ],
+  "colors": [
+    {"name": "black", "hex": "#000000"},
+    {"name": "white", "hex": "#FFFFFF"},
+    {"name": "grey", "hex": "#808080"},
+    {"name": "charcoal", "hex": "#36454F"},
+    {"name": "cream", "hex": "#FFFDD0"},
+    {"name": "beige", "hex": "#D8C3A5"},
+    {"name": "tan", "hex": "#C19A6B"},
+    {"name": "brown", "hex": "#6B4226"},
+    {"name": "navy", "hex": "#1F2A5A"},
+    {"name": "blue", "hex": "#2A5DB0"},
+    {"name": "light_blue", "hex": "#9CC3E6"},
+    {"name": "teal", "hex": "#1B7F7A"},
+    {"name": "green", "hex": "#2E8B57"},
+    {"name": "olive", "hex": "#6B7B3A"},
+    {"name": "mint", "hex": "#A8E6CF"},
+    {"name": "yellow", "hex": "#F2D544"},
+    {"name": "mustard", "hex": "#D4A017"},
+    {"name": "orange", "hex": "#E8761E"},
+    {"name": "red", "hex": "#C62828"},
+    {"name": "maroon", "hex": "#6D1A2B"},
+    {"name": "pink", "hex": "#F2A1C0"},
+    {"name": "purple", "hex": "#6A3FA0"},
+    {"name": "lavender", "hex": "#C7B8EA"},
+    {"name": "gold", "hex": "#D4AF37"},
+    {"name": "silver", "hex": "#C0C0C0"},
+    {"name": "multicolor", "hex": "#B0B0B0"}
+  ],
+  "categories": [
+    {
+      "name": "top",
+      "subcategories": [
+        "t_shirt", "shirt", "polo", "blouse", "tank_top", "sweater", "sweatshirt", "hoodie",
+        "henley", "crop_top", "tunic"
+      ],
+      "details": {
+        "collar": [
+          "crew_neck", "v_neck", "polo", "spread", "button_down", "mandarin", "band", "henley",
+          "turtleneck", "boat_neck", "hooded", "none"
+        ],
+        "sleeve_length": ["sleeveless", "short", "three_quarter", "long"],
+        "closure": ["pullover", "buttons", "zip", "snaps"],
+        "fit": ["slim", "regular", "relaxed", "oversized"]
+      }
+    },
+    {
+      "name": "bottom",
+      "subcategories": [
+        "jeans", "trousers", "chinos", "shorts", "joggers", "track_pants", "cargo", "skirt",
+        "leggings", "palazzo"
+      ],
+      "details": {
+        "fit": ["skinny", "slim", "straight", "regular", "relaxed", "wide_leg", "tapered", "bootcut"],
+        "rise": ["low", "mid", "high"],
+        "length": ["full", "ankle", "cropped", "knee", "mini", "midi", "maxi"],
+        "closure": ["zip_button", "buttons", "drawstring", "elastic", "hook_eye"]
+      }
+    },
+    {
+      "name": "footwear",
+      "subcategories": [
+        "sneakers", "loafers", "oxfords", "derbies", "boots", "sandals", "slippers", "heels",
+        "flats", "sports_shoes", "mojari", "kolhapuri"
+      ],
+      "details": {
+        "closure": ["laces", "slip_on", "buckle", "velcro", "zip"],
+        "heel": ["flat", "low", "block", "high", "wedge", "platform"],
+        "toe": ["round", "pointed", "square", "almond", "open"]
+      }
+    },
+    {
+      "name": "layer",
+      "subcategories": [
+        "blazer", "jacket", "overshirt", "cardigan", "coat", "waistcoat", "denim_jacket",
+        "bomber", "nehru_jacket", "shrug"
+      ],
+      "details": {
+        "collar": ["notch_lapel", "peak_lapel", "shawl", "mandarin", "standard", "hooded", "none"],
+        "sleeve_length": ["sleeveless", "short", "three_quarter", "long"],
+        "closure": ["buttons", "zip", "snaps", "open_front"],
+        "fit": ["slim", "regular", "relaxed", "oversized"]
+      }
+    },
+    {
+      "name": "dress",
+      "subcategories": [
+        "casual_dress", "shirt_dress", "maxi_dress", "midi_dress", "party_dress", "gown",
+        "jumpsuit"
+      ],
+      "details": {
+        "neckline": [
+          "round", "v_neck", "square", "halter", "off_shoulder", "boat", "collared", "strapless",
+          "one_shoulder"
+        ],
+        "sleeve_length": ["sleeveless", "short", "three_quarter", "long"],
+        "length": ["mini", "knee", "midi", "maxi", "floor"],
+        "silhouette": ["a_line", "fit_and_flare", "sheath", "bodycon", "shift", "wrap", "empire", "straight"]
+      }
+    },
+    {
+      "name": "ethnic",
+      "subcategories": [
+        "kurta", "kurti", "kurta_set", "sherwani", "saree", "lehenga", "salwar_kameez",
+        "anarkali", "churidar", "dhoti", "pyjama", "dupatta"
+      ],
+      "details": {
+        "neckline": ["round", "v_neck", "mandarin", "boat", "square", "keyhole", "collared"],
+        "sleeve_length": ["sleeveless", "short", "three_quarter", "long"],
+        "length": ["hip", "knee", "calf", "ankle", "floor"],
+        "silhouette": ["straight", "a_line", "flared", "anarkali", "tailored", "relaxed"]
+      }
+    },
+    {
+      "name": "set",
+      "subcategories": ["co_ord_set", "suit", "tracksuit", "pyjama_set"],
+      "details": {
+        "fit": ["slim", "regular", "relaxed", "oversized"]
+      }
+    },
+    {
+      "name": "activewear",
+      "subcategories": [
+        "sports_tshirt", "sports_bra", "tank", "shorts", "leggings", "track_pants", "jacket"
+      ],
+      "details": {
+        "fit": ["compression", "slim", "regular", "relaxed"],
+        "sleeve_length": ["sleeveless", "short", "long"]
+      }
+    },
+    {
+      "name": "accessory",
+      "subcategories": [
+        "belt", "watch", "scarf", "cap", "hat", "bag", "tie", "bow_tie", "sunglasses", "jewelry",
+        "pocket_square", "socks"
+      ],
+      "details": {}
+    }
+  ]
+}

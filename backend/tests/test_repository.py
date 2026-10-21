@@ -91,7 +91,7 @@ def _seed(uow: UnitOfWork) -> dict[str, str]:
             primary_color="blue",
             secondary_colors=["white"],
             pattern="striped",
-            style_tags=["smart casual"],
+            style_tags=["smart_casual"],
         ).id,
         "jeans": g.add("Blue jeans", category="bottom", primary_color="blue").id,
         "shoes": g.add(

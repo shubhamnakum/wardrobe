@@ -54,6 +54,8 @@ class Garment(Base):
     style_tags: Mapped[list[str] | None] = mapped_column(_json())
     season_tags: Mapped[list[str] | None] = mapped_column(_json())
     layering_role: Mapped[str | None] = mapped_column(String)
+    # Category-specific details such as {"collar": "mandarin", "fit": "slim"}; see taxonomy.
+    details: Mapped[dict[str, str] | None] = mapped_column(_json())
     availability_status: Mapped[str] = mapped_column(String, server_default="available")
     deleted_at: Mapped[str | None] = mapped_column(String)
     created_at: Mapped[str] = mapped_column(String, server_default=_NOW)
@@ -68,6 +70,7 @@ class Garment(Base):
         ),
         CheckConstraint("style_tags IS NULL OR json_valid(style_tags)", name="style_tags_json"),
         CheckConstraint("season_tags IS NULL OR json_valid(season_tags)", name="season_tags_json"),
+        CheckConstraint("details IS NULL OR json_valid(details)", name="details_json"),
         # ponytail: style_tags is JSON and not plain-indexable; tag filters scan (fine ~500 items).
         Index("idx_garment_category", "category"),
         Index("idx_garment_primary_color", "primary_color"),
