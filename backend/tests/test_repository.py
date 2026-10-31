@@ -253,3 +253,43 @@ def test_model_code_does_not_import_repository() -> None:
     for package in ("llm", "vision"):
         for py in (app_dir / package).rglob("*.py"):
             assert not pattern.search(py.read_text(encoding="utf-8")), py
+
+
+def test_garment_add_defaults_display_name_when_omitted(engine: Engine) -> None:
+    """Omitted or empty display_name is auto-generated; explicit display_name is preserved."""
+    with UnitOfWork(engine) as uow:
+        # 1. Totally omitted display_name
+        g1 = uow.garments.add(
+            category="top",
+            subcategory="shirt",
+            primary_color="navy",
+            details={"fit": "slim"},
+        )
+        assert g1.display_name == "Navy Slim Shirt"
+
+        # 2. display_name=None
+        g2 = uow.garments.add(
+            None,
+            category="bottom",
+            subcategory="jeans",
+            primary_color="black",
+        )
+        assert g2.display_name == "Black Jeans"
+
+        # 3. display_name="" (empty string)
+        g3 = uow.garments.add(
+            "   ",
+            category="footwear",
+            subcategory="sneakers",
+            primary_color="white",
+        )
+        assert g3.display_name == "White Sneakers"
+
+        # 4. Explicit non-empty display_name is preserved
+        g4 = uow.garments.add(
+            "My Favorite Tee",
+            category="top",
+            subcategory="t_shirt",
+            primary_color="white",
+        )
+        assert g4.display_name == "My Favorite Tee"

@@ -434,5 +434,5 @@ def test_migrations_upgrade_downgrade_upgrade(tmp_path: Path) -> None:
     with engine.connect() as conn:
         columns = {row[1] for row in conn.execute(text("PRAGMA table_info(garment)"))}
         version = conn.execute(text("SELECT version_num FROM alembic_version")).scalar()
-    assert "details" in columns and version == "002"
+    assert "details" in columns and version == "003"
     engine.dispose()

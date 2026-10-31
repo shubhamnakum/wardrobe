@@ -300,3 +300,43 @@ def test_data_survives_app_restart() -> None:
         d = second.get(f"/api/garments/{ids['tee']}").json()
         assert d["primary_color"] == "cream" and d["attributes"]["primary_color"]["confirmed"]
         assert second.get(f"/api/garments/{ids['jeans']}").status_code == 404
+
+
+# --- display name defaulting and rename (BE-E1-S7-T2) ---------------------------------------
+
+
+def test_garment_auto_named_visible_in_list_and_detail_and_can_be_renamed(
+    client: TestClient,
+) -> None:
+    """Auto-generated display_name appears in list and detail responses and can be renamed."""
+    # 1. Add garment without display_name
+    with UnitOfWork(client.app.state.engine) as uow:  # type: ignore[attr-defined]
+        garment = uow.garments.add(
+            category="top",
+            subcategory="shirt",
+            primary_color="navy",
+            details={"fit": "slim"},
+        )
+        gid = garment.id
+
+    # 2. List endpoint exposes auto-generated name
+    items = client.get("/api/garments").json()["items"]
+    target = next((item for item in items if item["id"] == gid), None)
+    assert target is not None
+    assert target["display_name"] == "Navy Slim Shirt"
+
+    # 3. Detail endpoint exposes auto-generated name
+    detail = client.get(f"/api/garments/{gid}").json()
+    assert detail["display_name"] == "Navy Slim Shirt"
+
+    # 4. User can rename via PATCH
+    patch_res = client.patch(
+        f"/api/garments/{gid}",
+        json={"display_name": "My Favorite Oxford"},
+    )
+    assert patch_res.status_code == 200
+    assert patch_res.json()["display_name"] == "My Favorite Oxford"
+
+    # 5. Detail confirms rename persisted
+    detail_after = client.get(f"/api/garments/{gid}").json()
+    assert detail_after["display_name"] == "My Favorite Oxford"

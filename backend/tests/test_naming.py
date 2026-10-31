@@ -148,4 +148,3 @@ def test_generate_display_name_enforces_max_length() -> None:
     )
     assert len(long_name) <= 40
     assert MAX_DISPLAY_NAME_LENGTH == 100
-

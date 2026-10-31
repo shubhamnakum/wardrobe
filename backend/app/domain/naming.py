@@ -97,4 +97,3 @@ def generate_display_name(
     if len(name) > max_length:
         return name[:max_length].rstrip()
     return name
-

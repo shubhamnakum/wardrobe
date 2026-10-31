@@ -74,6 +74,7 @@ class Garment(Base):
         # ponytail: style_tags is JSON and not plain-indexable; tag filters scan (fine ~500 items).
         Index("idx_garment_category", "category"),
         Index("idx_garment_primary_color", "primary_color"),
+        Index("idx_garment_display_name", "display_name"),
         Index("idx_garment_availability", "availability_status", "deleted_at"),
     )
 

@@ -9,6 +9,7 @@ from typing import Any
 from sqlalchemy import ColumnElement, Select, exists, func, literal, or_, select
 from sqlalchemy.orm import Session
 
+from app.domain.naming import generate_display_name
 from app.domain.taxonomy import get_taxonomy
 from app.repository.models import Garment, GarmentImage, Processing
 from app.repository.util import utcnow_iso
@@ -75,15 +76,27 @@ class GarmentRepository:
         """Use the given session (owned by the unit of work)."""
         self._s = session
 
-    def add(self, display_name: str, **fields: Any) -> Garment:
+    def add(self, display_name: str | None = None, **fields: Any) -> Garment:
         """Create a garment from ``display_name`` plus editable fields.
+
+        If ``display_name`` is omitted or empty, generates a natural default name from the
+        garment's attributes (e.g. 'Navy Slim Shirt') using :func:`generate_display_name`.
 
         Raises ``ValueError`` for unknown field names and ``TaxonomyError`` for values outside
         the taxonomy (category, colors, pattern, details, ...).
         """
         _check_fields(fields)
         get_taxonomy().validate_fields(fields)
-        garment = Garment(id=str(uuid.uuid4()), display_name=display_name, **fields)
+        name = (display_name or "").strip()
+        if not name:
+            name = generate_display_name(
+                category=fields.get("category"),
+                subcategory=fields.get("subcategory"),
+                primary_color=fields.get("primary_color"),
+                pattern=fields.get("pattern"),
+                details=fields.get("details"),
+            )
+        garment = Garment(id=str(uuid.uuid4()), display_name=name, **fields)
         self._s.add(garment)
         self._s.flush()
         return garment
