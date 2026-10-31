@@ -1,5 +1,6 @@
 {
-  "version": 1,
+  "version": 2,
+  "open_fields": ["primary_color", "secondary_colors", "pattern", "style_tags"],
   "formality": {
     "min": 1,
     "max": 5,
@@ -21,7 +22,7 @@
   "patterns": [
     "solid", "striped", "checked", "plaid", "houndstooth", "polka_dot", "floral", "printed",
     "paisley", "geometric", "abstract", "animal_print", "camouflage", "tie_dye", "colour_block",
-    "embroidered", "textured", "graphic"
+    "embroidered", "textured", "graphic", "linen_weave"
   ],
   "colors": [
     {"name": "black", "hex": "#000000"},
@@ -49,6 +50,7 @@
     {"name": "lavender", "hex": "#C7B8EA"},
     {"name": "gold", "hex": "#D4AF37"},
     {"name": "silver", "hex": "#C0C0C0"},
+    {"name": "khaki", "hex": "#C3B091"},
     {"name": "multicolor", "hex": "#B0B0B0"}
   ],
   "categories": [

@@ -1,4 +1,4 @@
-"""Tests for the taxonomy (BE-E1-S6): loading, validation, cleaning AI output and the API."""
+﻿"""Tests for the taxonomy (BE-E1-S6): loading, validation, cleaning AI output and the API."""
 
 import copy
 import json
@@ -149,10 +149,12 @@ def test_taxonomy_endpoint(client: TestClient) -> None:
     "fields",
     [
         {"category": "hat"},
-        {"primary_color": "ivory"},
-        {"secondary_colors": ["white", "ivory"]},
-        {"pattern": "spotty"},
-        {"style_tags": ["casual", "wacky"]},
+        # open fields: bad format (not lower_snake_case) still rejected
+        {"primary_color": "Ivory White"},
+        {"secondary_colors": ["white", "Ivory White"]},
+        {"pattern": "Very Spotty!"},
+        {"style_tags": ["casual", "Wacky Style"]},
+        # closed fields: any unknown value rejected
         {"season_tags": ["fall"]},
         {"layering_role": "top"},
         {"formality": 0},
@@ -166,9 +168,32 @@ def test_taxonomy_endpoint(client: TestClient) -> None:
     ],
 )
 def test_validate_rejects_values_outside_taxonomy(tax: Taxonomy, fields: dict[str, Any]) -> None:
-    """Each kind of invalid value raises a TaxonomyError."""
+    """Each kind of invalid value raises a TaxonomyError.
+
+    Open fields (colors, pattern, style_tags) accept custom lower_snake_case values but still
+    reject badly-formatted strings (spaces, capitals, special characters).
+    """
     with pytest.raises(TaxonomyError):
         tax.validate_fields(fields)
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"primary_color": "coral_peach"},                    # custom color not in palette
+        {"secondary_colors": ["white", "earthy_rust"]},      # mix curated + custom
+        {"pattern": "cotton_linen"},                         # custom texture pattern
+        {"style_tags": ["casual", "dopamine_dressing"]},     # curated + custom tag
+    ],
+)
+def test_validate_accepts_custom_values_for_open_fields(
+    tax: Taxonomy, fields: dict[str, Any]
+) -> None:
+    """Open fields (colors, pattern, style_tags) accept user-defined lower_snake_case values
+    that are not in the curated list. The taxonomy list is treated as suggestions for humans,
+    not a hard constraint. AI output is still sanitized strictly.
+    """
+    tax.validate_fields(fields)  # must not raise
 
 
 def test_validate_accepts_valid_and_null_values(tax: Taxonomy) -> None:
@@ -191,9 +216,13 @@ def test_validate_accepts_valid_and_null_values(tax: Taxonomy) -> None:
 
 
 def test_validate_reports_every_problem(tax: Taxonomy) -> None:
-    """All errors are collected, not just the first."""
+    """All errors are collected, not just the first.
+
+    Uses two closed-field errors (category, season_tag) plus one formality error so the
+    count is predictable regardless of open-field behaviour.
+    """
     with pytest.raises(TaxonomyError) as exc:
-        tax.validate_fields({"category": "hat", "pattern": "spotty", "formality": 9})
+        tax.validate_fields({"category": "hat", "season_tags": ["fall"], "formality": 9})
     assert len(exc.value.errors) == 3
 
 
@@ -288,7 +317,8 @@ def test_repository_rejects_invalid_values_on_add(client: TestClient) -> None:
     ("body", "field"),
     [
         ({"category": "hat"}, ["body", "category"]),
-        ({"primary_color": "ivory"}, ["body", "primary_color"]),
+        # primary_color with bad format (open field, but must be lower_snake_case)
+        ({"primary_color": "Ivory White"}, ["body", "primary_color"]),
         ({"details": {"collar": "mandarin"}}, ["body", "details"]),  # garment has no category
         ({"subcategory": "t_shirt"}, ["body", "subcategory"]),
     ],
@@ -296,7 +326,11 @@ def test_repository_rejects_invalid_values_on_add(client: TestClient) -> None:
 def test_patch_outside_taxonomy_is_422_in_fastapi_shape(
     client: TestClient, body: dict[str, Any], field: list[str]
 ) -> None:
-    """Taxonomy errors use the same {"detail": [{"loc", "msg"}]} shape as other 422s."""
+    """Taxonomy errors use the same {"detail": [{"loc", "msg"}]} shape as other 422s.
+
+    Open fields (colors, pattern, style_tags) are still 422 when the value is not
+    lower_snake_case (e.g. has spaces or capitals).
+    """
     gid = _garment(client)
     r = client.patch(f"/api/garments/{gid}", json=body)
     assert r.status_code == 422

@@ -8,6 +8,11 @@ rest of the app uses:
 * :meth:`Taxonomy.sanitize` - clean AI output: values outside the lists become ``None``.
 * :meth:`Taxonomy.merge_details` - apply an edit to a garment's category-specific details.
 
+Some fields are **open**: ``colors``, ``patterns``, and ``style_tags`` are curated suggestions
+but users may supply custom values not in the list (e.g. a color like ``coral_peach`` or a
+tag like ``dopamine_dressing``). AI output for open fields is still sanitized to ``None`` if
+unknown — only human writes are trusted with custom values.
+
 Each category also defines *detail* attributes (collar, closure, fit, ...) with their allowed
 values, because which details make sense depends on the type of garment.
 """
@@ -27,6 +32,12 @@ DEFAULT_TAXONOMY_PATH = Path(__file__).resolve().parents[1] / "config" / "taxono
 
 _NAME = re.compile(r"^[a-z][a-z0-9_]*$")
 _HEX = re.compile(r"^#[0-9A-Fa-f]{6}$")
+
+# Fields that users may extend with custom lower_snake_case values beyond the curated list.
+# AI output for these fields is still sanitized (unknown → None). Only human writes are trusted.
+_OPEN_FIELD_NAMES: frozenset[str] = frozenset(
+    ["primary_color", "secondary_colors", "pattern", "style_tags"]
+)
 
 
 class TaxonomyError(ValueError):
@@ -51,6 +62,16 @@ def _check_names(what: str, values: Iterable[str]) -> None:
         seen.add(value)
     if not seen:
         raise ValueError(f"{what}: must not be empty")
+
+
+def _is_valid_custom_value(value: str) -> bool:
+    """Return True if ``value`` is a valid lower_snake_case custom value.
+
+    Used to validate user-supplied values for open fields (colors, patterns, style_tags).
+    Custom values follow the same naming rules as taxonomy entries so they are safe to store
+    and display consistently.
+    """
+    return bool(_NAME.match(value))
 
 
 class FormalityScale(BaseModel):
@@ -106,6 +127,10 @@ class Taxonomy(BaseModel):
 
     ``version`` is a whole number that is increased whenever the file changes, so clients can
     tell when to refresh cached copies.
+
+    ``open_fields`` lists the fields (e.g. ``primary_color``, ``pattern``, ``style_tags``) that
+    accept user-supplied custom values beyond the curated lists. AI output is still sanitized for
+    all fields; only human writes can use custom values.
     """
 
     version: int = Field(ge=1)
@@ -116,6 +141,7 @@ class Taxonomy(BaseModel):
     patterns: list[str]
     colors: list[ColorDef]
     categories: list[CategoryDef]
+    open_fields: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _check(self) -> "Taxonomy":
@@ -163,6 +189,14 @@ class Taxonomy(BaseModel):
             and self.formality.min <= value <= self.formality.max
         )
 
+    def is_open(self, field: str) -> bool:
+        """Return True if ``field`` accepts user-supplied custom values beyond the curated list.
+
+        Open fields (colors, patterns, style_tags) still validate that custom values use
+        lower_snake_case. AI output is never trusted for custom values.
+        """
+        return field in _OPEN_FIELD_NAMES
+
     # ---- checks for writes --------------------------------------------------------------
 
     def validate_fields(
@@ -174,6 +208,11 @@ class Taxonomy(BaseModel):
         ``current`` are the garment's existing values, used when a write changes only one half
         of a pair, for example a new ``category`` while ``subcategory`` stays as it was. The
         check covers every error found, not just the first.
+
+        **Open fields** (primary_color, secondary_colors, pattern, style_tags): values in the
+        curated list are always accepted. Values *not* in the list are also accepted from the
+        user as long as they are lower_snake_case — the taxonomy list acts as *suggestions*, not
+        a hard constraint for human writes.
         """
         cur = current or {}
         errors: list[str] = []
@@ -184,12 +223,33 @@ class Taxonomy(BaseModel):
 
         for name, allowed in self._single_value_sets().items():
             value = fields.get(name)
-            if value is not None and value not in allowed:
+            if value is None:
+                continue
+            if value in allowed:
+                continue  # always OK — it's in the curated list
+            if self.is_open(name):
+                # Custom user value: must still be lower_snake_case
+                if not _is_valid_custom_value(value):
+                    errors.append(
+                        f"{name}: '{value}' must be lower_snake_case"
+                        f" (e.g. 'coral_peach', not 'Coral Peach')"
+                    )
+            else:
                 errors.append(f"{name}: '{value}' is not allowed")
+
         for name, allowed in self._list_value_sets().items():
             for value in fields.get(name) or []:
-                if value not in allowed:
+                if value in allowed:
+                    continue  # in curated list
+                if self.is_open(name):
+                    if not _is_valid_custom_value(value):
+                        errors.append(
+                            f"{name}: '{value}' must be lower_snake_case"
+                            f" (e.g. 'earthy_rust', not 'Earthy Rust')"
+                        )
+                else:
                     errors.append(f"{name}: '{value}' is not allowed")
+
         if fields.get("formality") is not None and not self._formality_ok(fields["formality"]):
             errors.append(
                 f"formality: must be a whole number {self.formality.min}-{self.formality.max}"
@@ -256,6 +316,9 @@ class Taxonomy(BaseModel):
         Only keys present in ``attrs`` are returned. In list fields invalid items are dropped
         (``None`` if none are left). ``subcategory`` and ``details`` are kept only if they fit
         the (valid) category. AI output is untrusted, so this never raises.
+
+        Note: open fields (colors, patterns, style_tags) are still sanitized strictly for AI
+        output — the AI cannot invent custom values; only the user can.
         """
         out: dict[str, Any] = dict(attrs)
         singles = self._single_value_sets()
