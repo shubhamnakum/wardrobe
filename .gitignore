@@ -1,1 +1,4 @@
 root_docs/*
+.agents/*
+graphify-out/*
+AGENTS.md
