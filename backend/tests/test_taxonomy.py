@@ -1,4 +1,4 @@
-﻿"""Tests for the taxonomy (BE-E1-S6): loading, validation, cleaning AI output and the API."""
+"""Tests for the taxonomy (BE-E1-S6): loading, validation, cleaning AI output and the API."""
 
 import copy
 import json
@@ -180,10 +180,10 @@ def test_validate_rejects_values_outside_taxonomy(tax: Taxonomy, fields: dict[st
 @pytest.mark.parametrize(
     "fields",
     [
-        {"primary_color": "coral_peach"},                    # custom color not in palette
-        {"secondary_colors": ["white", "earthy_rust"]},      # mix curated + custom
-        {"pattern": "cotton_linen"},                         # custom texture pattern
-        {"style_tags": ["casual", "dopamine_dressing"]},     # curated + custom tag
+        {"primary_color": "coral_peach"},  # custom color not in palette
+        {"secondary_colors": ["white", "earthy_rust"]},  # mix curated + custom
+        {"pattern": "cotton_linen"},  # custom texture pattern
+        {"style_tags": ["casual", "dopamine_dressing"]},  # curated + custom tag
     ],
 )
 def test_validate_accepts_custom_values_for_open_fields(
